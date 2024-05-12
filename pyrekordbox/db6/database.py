@@ -195,7 +195,7 @@ class Rekordbox6Database:
     """
 
     def __init__(self, path=None, db_dir="", key="", unlock=True):
-        rb6_config = get_config("rekordbox6")
+        rb6_config = get_config("rekordbox6", dp=key)
         pid = get_rekordbox_pid()
         if pid:
             logger.warning("Rekordbox is running!")

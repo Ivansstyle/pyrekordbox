@@ -460,7 +460,7 @@ def write_db6_key_cache(key: str) -> None:  # pragma: no cover
 
 
 def _get_rb6_config(
-    pioneer_prog_dir: Path, pioneer_app_dir: Path, dirname: str = ""
+    pioneer_prog_dir: Path, pioneer_app_dir: Path, dirname: str = "", dp: str = ""
 ) -> dict:
     """Get the program configuration for Rekordbox v6.x.x."""
     major_version = 6
@@ -474,7 +474,7 @@ def _get_rb6_config(
     assert str(conf["db_path"]) == str(db_path)
 
     cache_version = 0
-    pw, dp = "", ""
+    pw = ""
     if _cache_file.exists():  # pragma: no cover
         logger.debug("Found cache file %s", _cache_file)
         # Read cache file
@@ -616,6 +616,7 @@ def update_config(
     pioneer_app_dir: Union[str, Path] = None,
     rb5_install_dirname: str = "",
     rb6_install_dirname: str = "",
+    dp: str = "",
 ):
     """Update the pyrekordbox configuration.
 
@@ -682,14 +683,14 @@ def update_config(
     # Update Rekordbox 6 config
     try:
         conf = _get_rb6_config(
-            pioneer_install_dir, pioneer_app_dir, rb6_install_dirname
+            pioneer_install_dir, pioneer_app_dir, rb6_install_dirname, dp
         )
         __config__["rekordbox6"].update(conf)
     except FileNotFoundError as e:
         logger.info(e)
 
 
-def get_config(section: str, key: str = None):
+def get_config(section: str, key: str = None, dp: str = ""):
     """Gets a section or value of the pyrekordbox configuration.
 
     Parameters
@@ -699,7 +700,8 @@ def get_config(section: str, key: str = None):
     key : str, optional
         The name of the specific value to return. If not given all values of the section
         are returned as dictionary.
-
+    dp : str
+        Database password string, required to prevent dp extraction on config update
     Returns
     -------
     data : str or Path or dict
@@ -707,7 +709,7 @@ def get_config(section: str, key: str = None):
     """
     # Update config if not done yet
     if not __config__[section]:
-        update_config()
+        update_config(dp=dp)
 
     conf = __config__[section]
     if key is None:
